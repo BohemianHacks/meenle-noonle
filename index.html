@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Meenle_Noonle is my software renderer demo, built to help me learn things I 
+    didn't previously know." />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <script type="module" src="index.js"></script>
+    <title>Meenle-Noonle</title>
+</head>
+<body>      
+    <style>
+        body{
+            background-color: hsl(.6turn,70%,15%);
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            font-family: system-ui;
+        }
+        #canvas-div{
+            margin: auto;
+            width: min-content;
+        }
+        canvas {
+            border: 3px solid white; 
+            border-radius: 15px;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+    </style>
+    <h1 id="title">Meenle-Noonle</h1>
+    <div id="canvas-div">
+        <canvas id="viewport" width="500" height="500"></canvas>
+    </div>
+</body>
+</html>

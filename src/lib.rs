@@ -3,7 +3,14 @@
 //! internal frame buffer ([render], [draw_line]), as well as a function to get a pointer to the frame buffer
 //! itself ([get_buffer]).
 
-use std::ops::Mul;
+#![cfg_attr(target_arch = "powerpc", no_std)]
+// #[cfg(target_arch = "powerpc")]
+// extern crate rs_ppc_test;
+#[cfg(target_arch = "powerpc")]
+extern crate alloc;
+#[cfg(target_arch = "powerpc")]
+use {alloc::vec, alloc::vec::Vec, rs_ppc_support::MSLmaths};
+use core::ops::Mul;
 mod meshes;
 
 // dimensions for the canvas
@@ -37,6 +44,7 @@ pub struct Vec3 {
 
 pub type Vertex = Vec3;
 /// Pixel for the frame buffer. RGBA color, to match HTML canvas' buffer format.
+#[repr(C)]
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub struct Pixel {
@@ -257,12 +265,12 @@ pub extern "C" fn draw_line(x0: f64, y0: f64, x1: f64, y1: f64) {
 
     let steep = (y1 - y0).abs() > (x1 - x0).abs();
     if steep {
-        std::mem::swap(&mut x0, &mut y0);
-        std::mem::swap(&mut x1, &mut y1);
+        core::mem::swap(&mut x0, &mut y0);
+        core::mem::swap(&mut x1, &mut y1);
     }
     if x0 > x1 {
-        std::mem::swap(&mut x0, &mut x1);
-        std::mem::swap(&mut y0, &mut y1);
+        core::mem::swap(&mut x0, &mut x1);
+        core::mem::swap(&mut y0, &mut y1);
     }
 
     let dx = x1 - x0;
@@ -323,7 +331,6 @@ pub extern "C" fn render(scalar: f64, x_angle: f64, y_angle: f64, z_angle: f64) 
     demo_mesh.scale(50_f64);
 
     demo_mesh.scale(scalar);
-
 
     demo_mesh.rot(Axis::X, x_angle);
     demo_mesh.rot(Axis::Y, y_angle);

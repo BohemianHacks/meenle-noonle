@@ -1,2 +1,6 @@
 [build]
 target = "wasm32-unknown-unknown"
+# target = "powerpc-unknown-eabi.json"
+
+# [unstable]
+# build-std =["alloc", "core"]

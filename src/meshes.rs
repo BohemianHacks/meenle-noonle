@@ -1,3 +1,8 @@
+#![allow(dead_code)]
+
+#[cfg(target_arch = "powerpc")]
+use alloc::vec::Vec;
+
 use crate::{Mesh, Tri, Vec3};
 
 #[rustfmt::skip]
@@ -12,12 +17,12 @@ static ICOSPHERE_TRIS: [Tri; 20] = [
 
 pub fn monkey() -> Mesh {
     Mesh {
-        tris: Vec::from(MONKEY_TRIS)
+        tris: Vec::from(MONKEY_TRIS),
     }
 }
 
 pub fn icosphere() -> Mesh {
     Mesh {
-        tris: Vec::from(ICOSPHERE_TRIS)
+        tris: Vec::from(ICOSPHERE_TRIS),
     }
 }

@@ -6,14 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["cdylib", "staticlib"]
+
+[target.powerpc-unknown-eabi.dependencies]
+rs_ppc_support = {path = "../../../Wii/dev/mw-ppc-test/rs-ppc-support"}
 
 [profile.dev]
 opt-level = "s"
 panic = "abort"
 
 [profile.release]
-opt-level = "s"
+debug = false
+opt-level = "z"
 panic = "abort"
-lto = "thin"
-debug = 0

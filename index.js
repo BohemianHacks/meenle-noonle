@@ -4,15 +4,14 @@
 const WIDTH = 500;
 const HEIGHT = 500;
 const BUFSIZE = WIDTH * HEIGHT * 4;
-const TAU = Math.PI * 2
-//seconds per rotation
-const ROTRATE = 5
+const TAU = Math.PI * 2;
+const ROTRATE = 5; //seconds per rotation
 
 const WASM_URL = "target/wasm32-unknown-unknown/debug/meenle_noonle.wasm";
 
-
+let bmapSupport = typeof createImageBitmap !== "undefined";
 let viewport = document.getElementById("viewport");
-let ctx = viewport.getContext("2d")
+let ctx = viewport.getContext(bmapSupport ? "bitmaprenderer" : "2d");
 
 // load wasm module
 if (WebAssembly.instantiateStreaming) {
@@ -22,29 +21,27 @@ if (WebAssembly.instantiateStreaming) {
 Your browser is likely old, please upgrade.")
     let wasm = await fetch(WASM_URL);
     let arrBuff = await wasm.arrayBuffer();
-    var instance= (await WebAssembly.instantiate(arrBuff)).instance;
+    var instance = (await WebAssembly.instantiate(arrBuff)).instance;
 } else {
-    console.warn("Wasm unsupported! Upgrade your browser.")
+    console.warn("Wasm unsupported! Upgrade your browser.");
     document.getElementById("title").textContent = "your browser is probably old, because wasm is \
-unavailable. no Meenlo-Noonle for you! you are missing out!"
+unavailable. no Meenlo-Noonle for you! you are missing out!";
 }
 
-instance.exports.generate_background()
-instance.exports.render(0, 0, 0 ,0)
+instance.exports.generate_background();
+instance.exports.render(0, 0, 0 ,0);
 
 let bufptr = instance.exports.get_buffer();
-let buffer = new Uint8ClampedArray(instance.exports.memory.buffer, bufptr, BUFSIZE)
+let buffer = new Uint8ClampedArray(instance.exports.memory.buffer, bufptr, BUFSIZE);
 let imgData, imgBmap;
-let bmapSupport = typeof createImageBitmap !== "undefined";
-if (!bmapSupport) {
-    console.warn("ImageBitmap not supported. Falling back to ImageData. Your browser is likely old, please upgrade.")
-}
+if (!bmapSupport) { console.warn("ImageBitmap not supported. Falling back to ImageData. Your browser is likely old, \
+please upgrade."); }
 
 async function pushBuffer() {
     imgData = new ImageData(buffer, WIDTH, HEIGHT);
     if (bmapSupport) {
         imgBmap = await createImageBitmap(imgData);
-        ctx.drawImage(imgBmap, 0, 0);
+        ctx.transferFromImageBitmap(imgBmap);
     } else {
         ctx.putImageData(imgData, 0, 0);    
     }
@@ -52,11 +49,11 @@ async function pushBuffer() {
 
 // runs every frame, rotates model @ ROTRATE seconds per rotation
 function onAnimFrame(timestamp) {
-    instance.exports.render(2, 0, (timestamp / 1000 * TAU / ROTRATE) % TAU, TAU / 2)
-    pushBuffer()
-    window.requestAnimationFrame(onAnimFrame)
+    instance.exports.render(2, TAU / 2, (timestamp / 1000 * TAU / ROTRATE) % TAU, 0);
+    pushBuffer();
+    window.requestAnimationFrame(onAnimFrame);
 }
 
-window.requestAnimationFrame(onAnimFrame)
+window.requestAnimationFrame(onAnimFrame);
 
 })()

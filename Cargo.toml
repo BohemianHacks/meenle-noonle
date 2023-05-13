@@ -1,12 +1,12 @@
 [package]
-name = "meenle-noonle"
+name = "meenle_noonle"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "lib"]
 
 [target.powerpc-unknown-eabi.dependencies]
 rs_ppc_support = {path = "../../../Wii/dev/mw-ppc-test/rs-ppc-support"}

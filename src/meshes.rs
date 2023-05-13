@@ -1,9 +1,11 @@
+//! Some sample meshes for demonstration.
+
 #![allow(dead_code)]
 
 #[cfg(target_arch = "powerpc")]
 use alloc::vec::Vec;
 
-use crate::{Mesh, Tri, Vec3};
+use crate::*;
 
 #[rustfmt::skip]
 static MONKEY_TRIS: [Tri; 967]= [

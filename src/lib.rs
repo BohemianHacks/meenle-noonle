@@ -4,18 +4,18 @@
 //! itself ([get_buffer]).
 
 #![cfg_attr(target_arch = "powerpc", no_std)]
-// #[cfg(target_arch = "powerpc")]
-// extern crate rs_ppc_test;
 #[cfg(target_arch = "powerpc")]
 extern crate alloc;
 #[cfg(target_arch = "powerpc")]
 use {alloc::vec, alloc::vec::Vec, rs_ppc_support::MSLmaths};
+
 use core::ops::Mul;
-mod meshes;
+pub mod meshes;
+pub mod demo;
 
 // dimensions for the canvas
-const WIDTH: usize = 500;
-const HEIGHT: usize = 500;
+pub const WIDTH: usize = 500;
+pub const HEIGHT: usize = 500;
 
 /// Frame buffer.
 static mut BUFFER: [[Pixel; WIDTH]; HEIGHT] = [[Pixel {
@@ -35,6 +35,7 @@ pub enum Axis {
     Z,
 }
 
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
@@ -55,22 +56,18 @@ pub struct Pixel {
 }
 
 impl Pixel {
-    const fn _black() -> Pixel {
-        Pixel {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 255,
-        }
-    }
-    const fn white() -> Pixel {
-        Pixel {
-            r: 255,
-            g: 255,
-            b: 255,
-            a: 255,
-        }
-    }
+    const _BLACK: Pixel = Pixel {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 255,
+    };
+    const WHITE: Pixel = Pixel {
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+    };
 }
 
 impl Mul<Vec3> for f64 {
@@ -157,22 +154,28 @@ pub struct Tri {
 impl Tri {
     /// Draws itself into the framebuffer.
     fn render(&self) {
+        const DEPTH_RANGE: f64 = 0.0;
+        const MODEL_Z_RANGE: f64 = 50.0;
+        let stereoscopy_offset = |idx_vtx: usize| -> f64 {
+            (-2.0 * DEPTH_RANGE) * (self.verts[idx_vtx].z + MODEL_Z_RANGE) / (2.0 * MODEL_Z_RANGE)
+                - DEPTH_RANGE
+        };
         draw_line(
-            self.verts[0].x,
+            self.verts[0].x + stereoscopy_offset(0),
             self.verts[0].y,
-            self.verts[1].x,
+            self.verts[1].x + stereoscopy_offset(1),
             self.verts[1].y,
         );
         draw_line(
-            self.verts[1].x,
+            self.verts[1].x + stereoscopy_offset(1),
             self.verts[1].y,
-            self.verts[2].x,
+            self.verts[2].x + stereoscopy_offset(2),
             self.verts[2].y,
         );
         draw_line(
-            self.verts[2].x,
+            self.verts[2].x + stereoscopy_offset(2),
             self.verts[2].y,
-            self.verts[0].x,
+            self.verts[0].x + stereoscopy_offset(0),
             self.verts[0].y,
         );
     }
@@ -281,9 +284,9 @@ pub extern "C" fn draw_line(x0: f64, y0: f64, x1: f64, y1: f64) {
 
     for x in x0..=x1 {
         if steep {
-            plot_pixel(y as usize, x as usize, &Pixel::white());
+            plot_pixel(y as usize, x as usize, &Pixel::WHITE);
         } else {
-            plot_pixel(x as usize, y as usize, &Pixel::white());
+            plot_pixel(x as usize, y as usize, &Pixel::WHITE);
         }
         error -= dy;
         if error < 0 {

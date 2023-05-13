@@ -7,7 +7,7 @@ const BUFSIZE = WIDTH * HEIGHT * 4;
 const TAU = Math.PI * 2;
 const ROTRATE = 5; //seconds per rotation
 
-const WASM_URL = "target/wasm32-unknown-unknown/debug/meenle_noonle.wasm";
+const WASM_URL = "target/wasm32-unknown-unknown/release/meenle_noonle.wasm";
 
 let bmapSupport = typeof createImageBitmap !== "undefined";
 let viewport = document.getElementById("viewport");
@@ -48,8 +48,8 @@ async function pushBuffer() {
 }
 
 // runs every frame, rotates model @ ROTRATE seconds per rotation
-function onAnimFrame(timestamp) {
-    instance.exports.render(2, TAU / 2, (timestamp / 1000 * TAU / ROTRATE) % TAU, 0);
+function onAnimFrame() {
+    instance.exports.render(2, TAU / 2, (Date.now() / 1000 * TAU / ROTRATE) % TAU, 0);
     pushBuffer();
     window.requestAnimationFrame(onAnimFrame);
 }

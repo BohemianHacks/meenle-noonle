@@ -17,7 +17,7 @@
 
 use crate::meshes;
 use crate::*;
-use core::f64::consts::TAU;
+use core::f32::consts::TAU;
 
 static mut DEMO_MESH: Option<Mesh> = None;
 
@@ -55,7 +55,7 @@ pub extern "C" fn set_mesh(id: u32) {
 }
 
 #[no_mangle]
-pub extern "C" fn scale_mesh_to_screen(_proportion: f64) {
+pub extern "C" fn scale_mesh_to_screen(_proportion: f32) {
     unsafe {
         if let Some(ref mut demo_mesh) = DEMO_MESH {
             let oba = demo_mesh
@@ -63,7 +63,7 @@ pub extern "C" fn scale_mesh_to_screen(_proportion: f64) {
                 .iter()
                 .flat_map(|tri| tri.verts)
                 .flat_map(|vert| [vert.x, vert.y, vert.z])
-                .reduce(f64::max);
+                .reduce(f32::max);
             dbg!(oba);
         }
     }
@@ -71,7 +71,7 @@ pub extern "C" fn scale_mesh_to_screen(_proportion: f64) {
 
 /// Render the spinning mesh animation into the frame buffer.
 #[no_mangle]
-pub extern "C" fn render_spin(time_seconds: f64, rotrate: f64) {
+pub extern "C" fn render_spin(time_seconds: f32, rotrate: f32) {
     unsafe {
         if let Some(ref mut demo_mesh) = DEMO_MESH {
             let mut opa = demo_mesh.clone();

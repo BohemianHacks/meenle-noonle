@@ -38,9 +38,9 @@ pub enum Axis {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 pub type Vertex = Vec3;
@@ -70,7 +70,7 @@ impl Pixel {
     };
 }
 
-impl Mul<Vec3> for f64 {
+impl Mul<Vec3> for f32 {
     type Output = Vec3;
 
     fn mul(self, rhs: Vec3) -> Self::Output {
@@ -78,8 +78,8 @@ impl Mul<Vec3> for f64 {
     }
 }
 
-impl From<[f64; 3]> for Vec3 {
-    fn from(nums: [f64; 3]) -> Self {
+impl From<[f32; 3]> for Vec3 {
+    fn from(nums: [f32; 3]) -> Self {
         Vec3 {
             x: nums[0],
             y: nums[1],
@@ -90,19 +90,19 @@ impl From<[f64; 3]> for Vec3 {
 
 /// Simple 3x3 Matrix for graphics maths.
 pub struct Mat3x3 {
-    pub mat: [[f64; 3]; 3],
+    pub mat: [[f32; 3]; 3],
 }
 
 impl Mat3x3 {
     /// This poorly named function actually gives the 3x3 identity matrix scaled by the parameter `val`.
-    pub const fn identity(val: f64) -> Mat3x3 {
+    pub const fn identity(val: f32) -> Mat3x3 {
         Mat3x3 {
             mat: [[val, 0.0, 0.0], [0.0, val, 0.0], [0.0, 0.0, val]],
         }
     }
 
     /// Gives a rotation matrix to rotate a vertex about the origin.
-    pub fn rot(angle: f64, axis: Axis) -> Mat3x3 {
+    pub fn rot(angle: f32, axis: Axis) -> Mat3x3 {
         match axis {
             Axis::X => Mat3x3 {
                 mat: [
@@ -151,9 +151,9 @@ pub struct Tri {
 impl Tri {
     /// Draws itself into the framebuffer.
     fn render(&self) {
-        const DEPTH_RANGE: f64 = 0.0;
-        const MODEL_Z_RANGE: f64 = 50.0;
-        let stereoscopy_offset = |idx_vtx: usize| -> f64 {
+        const DEPTH_RANGE: f32 = 0.0;
+        const MODEL_Z_RANGE: f32 = 50.0;
+        let stereoscopy_offset = |idx_vtx: usize| -> f32 {
             (-2.0 * DEPTH_RANGE) * (self.verts[idx_vtx].z + MODEL_Z_RANGE) / (2.0 * MODEL_Z_RANGE)
                 - DEPTH_RANGE
         };
@@ -229,7 +229,7 @@ impl Mesh {
     }
 
     /// Scales the mesh by the given scalar.
-    pub fn scale(&mut self, scalar: f64) {
+    pub fn scale(&mut self, scalar: f32) {
         for tri in &mut self.tris {
             for vert in &mut tri.verts {
                 *vert = Mat3x3::identity(scalar) * *vert
@@ -238,7 +238,7 @@ impl Mesh {
     }
 
     /// Rotates the mesh.
-    pub fn rot(&mut self, axis: Axis, angle: f64) {
+    pub fn rot(&mut self, axis: Axis, angle: f32) {
         for tri in &mut self.tris {
             for vert in &mut tri.verts {
                 *vert = Mat3x3::rot(angle, axis) * *vert;
@@ -267,7 +267,7 @@ fn plot_pixel(x: usize, y: usize, pixel: &Pixel) {
 
 /// Uses Bresenham's algorithm to draw a line.
 #[no_mangle]
-pub extern "C" fn draw_line(x0: f64, y0: f64, x1: f64, y1: f64) {
+pub extern "C" fn draw_line(x0: f32, y0: f32, x1: f32, y1: f32) {
     let mut x0 = x0 as i32 + (WIDTH / 2) as i32;
     let mut y0 = y0 as i32 + (WIDTH / 2) as i32;
     let mut x1 = x1 as i32 + (WIDTH / 2) as i32;
@@ -310,9 +310,9 @@ pub extern "C" fn generate_background() {
         for (idx_row, row) in BG_BUFFER.iter_mut().enumerate() {
             for (idx_col, pxl) in row.iter_mut().enumerate() {
                 *pxl = Pixel {
-                    r: ((255.0 / HEIGHT as f64) * idx_row as f64) as u8,
-                    g: ((255.0 / WIDTH as f64) * idx_col as f64) as u8,
-                    b: ((-(255.0 / HEIGHT as f64) * idx_row as f64) + 255.0) as u8,
+                    r: ((255.0 / HEIGHT as f32) * idx_row as f32) as u8,
+                    g: ((255.0 / WIDTH as f32) * idx_col as f32) as u8,
+                    b: ((-(255.0 / HEIGHT as f32) * idx_row as f32) + 255.0) as u8,
                     a: 255,
                 };
             }
@@ -336,7 +336,7 @@ pub extern "C" fn get_buffer() -> &'static [[Pixel; WIDTH]; HEIGHT] {
 
 /// Renders the demo into the frame buffer.
 #[no_mangle]
-pub extern "C" fn render(scalar: f64, x_angle: f64, y_angle: f64, z_angle: f64) {
+pub extern "C" fn render(scalar: f32, x_angle: f32, y_angle: f32, z_angle: f32) {
     let mut demo_mesh = meshes::monkey();
     demo_mesh.scale(50.0);
 

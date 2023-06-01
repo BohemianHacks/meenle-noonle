@@ -6,7 +6,7 @@ const HEIGHT = 500;
 const BUFSIZE = WIDTH * HEIGHT * 4;
 const ROTRATE = 5; //seconds per rotation
 
-const WASM_URL = "target/wasm32-unknown-unknown/release/meenle_noonle.wasm";
+const WASM_URL = "meenle-noonle.wasm";
 
 let bmapSupport = typeof createImageBitmap !== "undefined";
 let viewport = document.getElementById("viewport");

@@ -4,7 +4,6 @@
 const WIDTH = 500;
 const HEIGHT = 500;
 const BUFSIZE = WIDTH * HEIGHT * 4;
-const TAU = Math.PI * 2;
 const ROTRATE = 5; //seconds per rotation
 
 const WASM_URL = "target/wasm32-unknown-unknown/release/meenle_noonle.wasm";
@@ -25,11 +24,13 @@ Your browser is likely old, please upgrade.")
 } else {
     console.warn("Wasm unsupported! Upgrade your browser.");
     document.getElementById("title").textContent = "your browser is probably old, because wasm is \
-unavailable. no Meenlo-Noonle for you! you are missing out!";
+unavailable. no Meenle-Noonle for you! you are missing out! :(";
 }
 
 instance.exports.generate_background();
-instance.exports.render(0, 0, 0 ,0);
+// instance.exports.render(0, 0, 0 ,0);
+instance.exports.set_mesh(0);
+
 
 let bufptr = instance.exports.get_buffer();
 let buffer = new Uint8ClampedArray(instance.exports.memory.buffer, bufptr, BUFSIZE);
@@ -38,6 +39,8 @@ if (!bmapSupport) { console.warn("ImageBitmap not supported. Falling back to Ima
 please upgrade."); }
 
 async function pushBuffer() {
+    bufptr = instance.exports.get_buffer();
+    buffer = new Uint8ClampedArray(instance.exports.memory.buffer, bufptr, BUFSIZE);
     imgData = new ImageData(buffer, WIDTH, HEIGHT);
     if (bmapSupport) {
         imgBmap = await createImageBitmap(imgData);
@@ -49,7 +52,7 @@ async function pushBuffer() {
 
 // runs every frame, rotates model @ ROTRATE seconds per rotation
 function onAnimFrame() {
-    instance.exports.render(2, TAU / 2, (Date.now() / 1000 * TAU / ROTRATE) % TAU, 0);
+    instance.exports.render_spin(Date.now() / 1000, ROTRATE);
     pushBuffer();
     window.requestAnimationFrame(onAnimFrame);
 }
@@ -57,3 +60,14 @@ function onAnimFrame() {
 window.requestAnimationFrame(onAnimFrame);
 
 })()
+
+document.addEventListener('keydown', function(event) {
+    switch (event.code) {
+        case "ArrowDown":
+            instance.exports.set_mesh(0);
+            break;
+        case "ArrowUp":
+            instance.exports.set_mesh(1);
+            break;
+    }
+});

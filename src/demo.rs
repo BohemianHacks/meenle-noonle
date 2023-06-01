@@ -1,8 +1,8 @@
 //! Demonstration of the meenle-noonle library. To use, first call [generate_background], then pick your mesh with
 //! [set_mesh], and use [get_buffer] to get the frame buffer where the output will be rendered. Call [render_spin]
-//! every frame to update the frame buffer. NOTE: The demo is not thread safe. You must wait for [set_mesh] to finish 
-//! execution before rendering. 
-//! 
+//! every frame to update the frame buffer. NOTE: The demo is not thread safe. You must wait for [set_mesh] to finish
+//! execution before rendering.
+//!
 //! Example usage:
 //! ```
 //! meenle_noonle::generate_background();
@@ -21,20 +21,21 @@ use core::f64::consts::TAU;
 
 static mut DEMO_MESH: Option<Mesh> = None;
 
-pub fn set_mesh(id: u32) {
+#[no_mangle]
+pub extern "C" fn set_mesh(id: u32) {
     unsafe {
         match id {
             0 => {
                 DEMO_MESH = Some(meshes::monkey());
                 if let Some(ref mut demo_mesh) = DEMO_MESH {
-                    demo_mesh.scale(100_f64);
+                    demo_mesh.scale(100.0);
                     demo_mesh.rot(Axis::X, TAU / 2.0);
                 }
             }
             1 => {
                 DEMO_MESH = Some(meshes::icosphere());
                 if let Some(ref mut demo_mesh) = DEMO_MESH {
-                    demo_mesh.scale(50_f64);
+                    demo_mesh.scale(50.0);
                     demo_mesh.rot(Axis::X, TAU / 2.0);
                 }
             }
@@ -53,11 +54,28 @@ pub fn set_mesh(id: u32) {
     }
 }
 
-pub fn render_spin(epoch_seconds: f64, rotrate: f64) {
+#[no_mangle]
+pub extern "C" fn scale_mesh_to_screen(_proportion: f64) {
+    unsafe {
+        if let Some(ref mut demo_mesh) = DEMO_MESH {
+            let oba = demo_mesh
+                .tris
+                .iter()
+                .flat_map(|tri| tri.verts)
+                .flat_map(|vert| [vert.x, vert.y, vert.z])
+                .reduce(f64::max);
+            dbg!(oba);
+        }
+    }
+}
+
+/// Render the spinning mesh animation into the frame buffer.
+#[no_mangle]
+pub extern "C" fn render_spin(time_seconds: f64, rotrate: f64) {
     unsafe {
         if let Some(ref mut demo_mesh) = DEMO_MESH {
             let mut opa = demo_mesh.clone();
-            opa.rot(Axis::Y, (epoch_seconds * TAU / rotrate) % TAU);
+            opa.rot(Axis::Y, (time_seconds * TAU / rotrate) % TAU);
             fill_buffer();
             opa.render();
         }

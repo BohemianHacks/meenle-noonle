@@ -9,7 +9,7 @@ edition = "2021"
 crate-type = ["cdylib", "lib"]
 
 [target.powerpc-unknown-eabi.dependencies]
-rs_ppc_support = {path = "../../../Wii/dev/mw-ppc-test/rs-ppc-support"}
+rs_ppc_support = {path = "rs-ppc-support"}
 
 [profile.dev]
 opt-level = "s"

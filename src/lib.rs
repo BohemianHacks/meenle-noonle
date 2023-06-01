@@ -10,8 +10,8 @@ extern crate alloc;
 use {alloc::vec, alloc::vec::Vec, rs_ppc_support::MSLmaths};
 
 use core::ops::Mul;
-pub mod meshes;
 pub mod demo;
+pub mod meshes;
 
 // dimensions for the canvas
 pub const WIDTH: usize = 500;
@@ -97,11 +97,7 @@ impl Mat3x3 {
     /// This poorly named function actually gives the 3x3 identity matrix scaled by the parameter `val`.
     pub const fn identity(val: f64) -> Mat3x3 {
         Mat3x3 {
-            mat: [
-                [val, 0_f64, 0_f64],
-                [0_f64, val, 0_f64],
-                [0_f64, 0_f64, val],
-            ],
+            mat: [[val, 0.0, 0.0], [0.0, val, 0.0], [0.0, 0.0, val]],
         }
     }
 
@@ -110,23 +106,23 @@ impl Mat3x3 {
         match axis {
             Axis::X => Mat3x3 {
                 mat: [
-                    [1_f64, 0_f64, 0_f64],
-                    [0_f64, angle.cos(), angle.sin()],
-                    [0_f64, -angle.sin(), angle.cos()],
+                    [1.0, 0.0, 0.0],
+                    [0.0, angle.cos(), angle.sin()],
+                    [0.0, -angle.sin(), angle.cos()],
                 ],
             },
             Axis::Y => Mat3x3 {
                 mat: [
-                    [angle.cos(), 0_f64, -angle.sin()],
-                    [0_f64, 1_f64, 0_f64],
-                    [angle.sin(), 0_f64, angle.cos()],
+                    [angle.cos(), 0.0, -angle.sin()],
+                    [0.0, 1.0, 0.0],
+                    [angle.sin(), 0.0, angle.cos()],
                 ],
             },
             Axis::Z => Mat3x3 {
                 mat: [
-                    [angle.cos(), -angle.sin(), 0_f64],
-                    [angle.sin(), angle.cos(), 0_f64],
-                    [0_f64, 0_f64, 1_f64],
+                    [angle.cos(), -angle.sin(), 0.0],
+                    [angle.sin(), angle.cos(), 0.0],
+                    [0.0, 0.0, 1.0],
                 ],
             },
         }
@@ -147,6 +143,7 @@ impl Mul<Vec3> for Mat3x3 {
 
 ///Triangle.
 #[derive(Debug, Copy, Clone)]
+#[repr(C)]
 pub struct Tri {
     pub verts: [Vertex; 3],
 }
@@ -185,6 +182,18 @@ impl Tri {
 #[derive(Debug, Clone)]
 pub struct Mesh {
     pub tris: Vec<Tri>,
+    pub loc: Vec3,
+    pub rot: Vec3,
+}
+
+impl From<Vec<Tri>> for Mesh {
+    fn from(value: Vec<Tri>) -> Self {
+        Mesh {
+            tris: value,
+            loc: Vec3::from([0.0, 0.0, 0.0]),
+            rot: Vec3::from([0.0, 0.0, 0.0]),
+        }
+    }
 }
 
 impl Mesh {
@@ -192,8 +201,7 @@ impl Mesh {
     #[rustfmt::skip]
     pub fn cube(v1: Vertex, v2: Vertex) -> Mesh {
         // Adapted from [javidx9's](https://www.youtube.com/c/javidx9/) olc 3d render engine
-        Mesh {
-            tris: vec![
+        Mesh::from (vec![
                 // South
                 Tri { verts: [ Vec3::from([ v1.x, v1.y, v1.z,]), Vec3::from([ v1.x, v2.y, v1.z,]), Vec3::from([ v2.x, v2.y, v1.z,])]},
                 Tri { verts: [ Vec3::from([ v1.x, v1.y, v1.z,]), Vec3::from([ v2.x, v2.y, v1.z,]), Vec3::from([ v2.x, v1.y, v1.z,])]},
@@ -217,8 +225,7 @@ impl Mesh {
                 // Bottom
                 Tri { verts: [ Vec3::from([ v2.x, v1.y, v2.z,]), Vec3::from([ v1.x, v1.y, v2.z,]), Vec3::from([ v1.x, v1.y, v1.z ])]},
                 Tri { verts: [ Vec3::from([ v2.x, v1.y, v2.z,]), Vec3::from([ v1.x, v1.y, v1.z,]), Vec3::from([ v2.x, v1.y, v1.z ])]},
-            ],
-        }
+            ])
     }
 
     /// Scales the mesh by the given scalar.
@@ -230,7 +237,7 @@ impl Mesh {
         }
     }
 
-    /// Roatates the mesh.
+    /// Rotates the mesh.
     pub fn rot(&mut self, axis: Axis, angle: f64) {
         for tri in &mut self.tris {
             for vert in &mut tri.verts {
@@ -239,7 +246,7 @@ impl Mesh {
         }
     }
 
-    /// Draws itself into the framebuffer.
+    /// Draws the mesh into the framebuffer.
     fn render(&self) {
         for tri in &self.tris {
             tri.render();
@@ -303,9 +310,9 @@ pub extern "C" fn generate_background() {
         for (idx_row, row) in BG_BUFFER.iter_mut().enumerate() {
             for (idx_col, pxl) in row.iter_mut().enumerate() {
                 *pxl = Pixel {
-                    r: ((255_f64 / HEIGHT as f64) * idx_row as f64) as u8,
-                    g: ((255_f64 / WIDTH as f64) * idx_col as f64) as u8,
-                    b: ((-(255_f64 / HEIGHT as f64) * idx_row as f64) + 255_f64) as u8,
+                    r: ((255.0 / HEIGHT as f64) * idx_row as f64) as u8,
+                    g: ((255.0 / WIDTH as f64) * idx_col as f64) as u8,
+                    b: ((-(255.0 / HEIGHT as f64) * idx_row as f64) + 255.0) as u8,
                     a: 255,
                 };
             }
@@ -331,7 +338,7 @@ pub extern "C" fn get_buffer() -> &'static [[Pixel; WIDTH]; HEIGHT] {
 #[no_mangle]
 pub extern "C" fn render(scalar: f64, x_angle: f64, y_angle: f64, z_angle: f64) {
     let mut demo_mesh = meshes::monkey();
-    demo_mesh.scale(50_f64);
+    demo_mesh.scale(50.0);
 
     demo_mesh.scale(scalar);
 

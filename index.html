@@ -13,15 +13,36 @@
 </head>
 <body>      
     <style>
-        body{
-            background-color: hsl(.6turn, 25%, 10%);
+        body {
+            background-color: hsl(.59turn, 70%, 15%);
+            margin: 0;
         }
         h1 {
             text-align: center;
             color: white;
             font-family: system-ui;
         }
-        #canvas-div{
+        a {
+            font-size: medium;
+            color: white;
+            font-family: system-ui;
+            width: fit-content;
+            text-decoration-line: none;
+            padding: .5rem;
+            border-radius: .5rem;
+        }
+        a:hover {
+            text-decoration-line: underline;
+            background-color: hsl(.59turn, 50%, 25%);
+        }
+        a:active{
+            background-color: hsl(.59turn, 50%, 15%);
+        }
+        #navbar {
+            padding: 1rem;
+            background-color: hsl(.59turn, 70%, 10%);
+        }
+        #canvas-div {
             margin: auto;
             width: min-content;
         }
@@ -30,6 +51,13 @@
             border-radius: 15px;
         }
     </style>
+    <div id="navbar">
+        <a href="https://github.com/KooShnoo/meenle-noonle">Source Code</a>
+        <a href="meenle-noonle-v1">Version 1</a>
+        <a href="meenle_noonle_rvl.dol">Download Wii version</a>
+        <a href="meenle_noonle_sdl">Download Mac version</a>
+        <a href="meenle_noonle_sdl.exe">Download Windows version (requires sdl2.dll)</a>
+    </div>
     <h1 id="title">Meenle-Noonle</h1>
     <div id="canvas-div">
         <canvas id="viewport" width="500" height="500"></canvas>

@@ -1,0 +1,17 @@
+[package]
+name = "rs_ppc_support"
+version = "0.1.0"
+edition = "2021"
+
+# [lib]
+# crate-type = ["staticlib", "lib"]
+
+[profile.dev]
+debug = true
+opt-level = 0
+panic = "abort"
+
+[profile.release]
+debug = false
+opt-level = "z"
+panic = "abort"

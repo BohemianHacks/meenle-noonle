@@ -28,8 +28,20 @@ unavailable. no Meenle-Noonle for you! you are missing out! :(";
 }
 
 instance.exports.generate_background();
-// instance.exports.render(0, 0, 0 ,0);
 instance.exports.set_mesh(0);
+document.addEventListener('keydown', function(event) {
+    switch (event.code) {
+        case "Digit1":
+            instance.exports.set_mesh(0);
+            break;
+        case "Digit2":
+            instance.exports.set_mesh(1);
+            break;
+        case "Digit3":
+            instance.exports.set_mesh(2);
+            break;
+    }
+});
 
 
 let bufptr = instance.exports.get_buffer();
@@ -60,14 +72,3 @@ function onAnimFrame() {
 window.requestAnimationFrame(onAnimFrame);
 
 })()
-
-document.addEventListener('keydown', function(event) {
-    switch (event.code) {
-        case "ArrowDown":
-            instance.exports.set_mesh(0);
-            break;
-        case "ArrowUp":
-            instance.exports.set_mesh(1);
-            break;
-    }
-});

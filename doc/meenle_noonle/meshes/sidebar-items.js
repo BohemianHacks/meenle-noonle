@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["icosphere","monkey"],"static":["ICOSPHERE_TRIS","MONKEY_FILE"]};

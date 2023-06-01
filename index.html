@@ -30,6 +30,7 @@
             text-decoration-line: none;
             padding: .5rem;
             border-radius: .5rem;
+            display: inline-block;
         }
         a:hover {
             text-decoration-line: underline;
@@ -42,6 +43,9 @@
             padding: 1rem;
             background-color: hsl(.59turn, 70%, 10%);
         }
+        @media (max-width: 500px) { #navbar {
+            width: 500px
+        }}
         #canvas-div {
             margin: auto;
             width: min-content;
@@ -53,6 +57,7 @@
     </style>
     <div id="navbar">
         <a href="https://github.com/KooShnoo/meenle-noonle">Source Code</a>
+        <a href="doc/meenle_noonle">Library Documentation</a>
         <a href="meenle-noonle-v1">Version 1</a>
         <a href="meenle_noonle_rvl.dol">Download Wii version</a>
         <a href="meenle_noonle_sdl">Download Mac version</a>

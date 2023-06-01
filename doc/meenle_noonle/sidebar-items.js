@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEPTH_RANGE","HEIGHT","MODEL_Z_RANGE","WIDTH"],"enum":["Axis"],"fn":["draw_line","fill_buffer","generate_background","get_buffer","plot_pixel","render"],"mod":["demo","meshes"],"static":["BG_BUFFER","BUFFER"],"struct":["Mat3x3","Mesh","Pixel","Tri","Vec3"],"type":["Vertex"]};
